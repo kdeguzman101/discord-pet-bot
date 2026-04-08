@@ -58,6 +58,20 @@ def _status_embed(pet_data: dict, title: str = None) -> discord.Embed:
     return embed
 
 
+@tree.command(name="rename", description="Rename your pet.")
+@app_commands.describe(name="The new name for your pet.")
+async def rename(interaction: discord.Interaction, name: str):
+    user_id = str(interaction.user.id)
+    row = db.get_pet(user_id)
+    if not row:
+        await interaction.response.send_message(
+            "You don't have a pet yet. Use `/adopt <name>` to get one!", ephemeral=True
+        )
+        return
+    db.update_pet(user_id, pet_name=name)
+    await interaction.response.send_message(f"Your pet has been renamed to **{name}**!")
+
+
 @tree.command(name="adopt", description="Adopt a new virtual pet.")
 @app_commands.describe(name="What will you name your pet?")
 async def adopt(interaction: discord.Interaction, name: str):
